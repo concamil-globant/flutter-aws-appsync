@@ -1,16 +1,28 @@
-# flutter_aws_appsync
+# flutter-aws-appsync
+flutter-aws example
 
-A new Flutter project.
+# setup - following steps to setup the app
+Install Amplify CLI
+1. https://docs.amplify.aws/cli/start/install/
 
-## Getting Started
+Create and setup the app
+2. https://docs.amplify.aws/lib/project-setup/create-application/q/platform/flutter/
 
-This project is a starting point for a Flutter application.
+GraphQL Setup
+3. https://docs.amplify.aws/lib/graphqlapi/getting-started/q/platform/flutter/
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+# dependencies -- add these to pubspec.yaml
+```
+dev_dependencies:
+  amplify_flutter: ^0.6.0
+  amplify_api: ^0.6.0
+```
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# Configuration Paths
+amplify models
+```
+amplify/backend/api/{api_name}/schema.graphql
+```
+
+
