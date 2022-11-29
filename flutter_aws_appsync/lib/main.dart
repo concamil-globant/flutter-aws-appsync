@@ -87,6 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+  // query one item
   Future<Todo?> queryItem(Todo queriedTodo) async {
     try {
       final request = ModelQueries.get(Todo.classType, queriedTodo.id);
@@ -100,6 +101,24 @@ class _MyHomePageState extends State<MyHomePage> {
       safePrint('Query failed: $e');
       return null;
     }
+  }
+
+  // fetch all
+  Future<List<Todo?>> queryListItems() async {
+    try {
+      final request = ModelQueries.list(Todo.classType);
+      final response = await Amplify.API.query(request: request).response;
+
+      final todos = response.data?.items;
+      if (todos == null) {
+        safePrint('errors: ${response.errors}');
+        return <Todo?>[];
+      }
+      return todos;
+    } on ApiException catch (e) {
+      safePrint('Query failed: $e');
+    }
+    return <Todo?>[];
   }
 
   @override
@@ -117,9 +136,19 @@ class _MyHomePageState extends State<MyHomePage> {
               child: const Text(
                 "Crear tabla Todo en AWS",
               ),
-              key: const Key('SignUpButton'),
+              key: const Key('createOneItemAws'),
               onPressed: () {
                 createTodo();
+              },
+            ),
+
+            OutlinedButton(
+              child: const Text(
+                "Listar Elementos en AWS",
+              ),
+              key: const Key('fetchAllElementsAws'),
+              onPressed: () {
+                queryListItems();
               },
             ),
 
