@@ -1,6 +1,8 @@
 // Amplify Flutter Packages
 import 'package:amplify_flutter/amplify_flutter.dart';
-import 'package:amplify_auth_cognito/amplify_auth_cognito.dart';
+
+import 'package:amplify_api/amplify_api.dart';
+import 'package:flutter_aws_appsync/models/ModelProvider.dart';
 
 // Generated in previous step (file inside ./lib)
 import 'amplifyconfiguration.dart';
@@ -11,8 +13,31 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  @override
+  initState() {
+    super.initState();
+    _configureAmplify();
+  }
+
+  Future<void> _configureAmplify() async {
+    final api = AmplifyAPI(modelProvider: ModelProvider.instance);
+    await Amplify.addPlugin(api);
+
+    try {
+      await Amplify.configure(amplifyconfig);
+    } on AmplifyAlreadyConfiguredException {
+      safePrint(
+          'Tried to reconfigure Amplify; this can occur when your app restarts on Android.');
+    }
+  }
 
   // This widget is the root of your application.
   @override
@@ -44,27 +69,36 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  @override
-  initState() {
-    super.initState();
-    _configureAmplify();
+  // AWS Methods
+  Future<void> createTodo() async {
+    try {
+      final todo = Todo(name: 'my first todo', description: 'todo description');
+      final request = ModelMutations.create(todo);
+      final response = await Amplify.API.mutate(request: request).response;
+
+      final createdTodo = response.data;
+      if (createdTodo == null) {
+        safePrint('errors: ${response.errors}');
+        return;
+      }
+      safePrint('Mutation result: ${createdTodo.name}');
+    } on ApiException catch (e) {
+      safePrint('Mutation failed: $e');
+    }
   }
 
-  Future<void> _configureAmplify() async {
-    // Add any Amplify plugins you want to use
-    final authPlugin = AmplifyAuthCognito();
-    await Amplify.addPlugin(authPlugin);
-
-    // You can use addPlugins if you are going to be adding multiple plugins
-    // await Amplify.addPlugins([authPlugin, analyticsPlugin]);
-
-    // Once Plugins are added, configure Amplify
-    // Note: Amplify can only be configured once.
+  Future<Todo?> queryItem(Todo queriedTodo) async {
     try {
-      await Amplify.configure(amplifyconfig);
-    } on AmplifyAlreadyConfiguredException {
-      safePrint(
-          "Tried to reconfigure Amplify; this can occur when your app restarts on Android.");
+      final request = ModelQueries.get(Todo.classType, queriedTodo.id);
+      final response = await Amplify.API.query(request: request).response;
+      final todo = response.data;
+      if (todo == null) {
+        safePrint('errors: ${response.errors}');
+      }
+      return todo;
+    } on ApiException catch (e) {
+      safePrint('Query failed: $e');
+      return null;
     }
   }
 
@@ -78,6 +112,18 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            // Crear Tabla
+            OutlinedButton(
+              child: const Text(
+                "Crear tabla Todo en AWS",
+              ),
+              key: const Key('SignUpButton'),
+              onPressed: () {
+                createTodo();
+              },
+            ),
+
+            // metodos por defecto
             const Text(
               'You have pushed the button this many times:',
             ),
