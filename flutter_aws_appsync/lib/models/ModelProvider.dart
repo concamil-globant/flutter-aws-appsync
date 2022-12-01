@@ -21,17 +21,21 @@
 
 import 'package:amplify_core/amplify_core.dart';
 import 'Todo.dart';
+import 'UserSession.dart';
+import 'Devices.dart';
 
+export 'Devices.dart';
 export 'Todo.dart';
+export 'UserSession.dart';
 
 class ModelProvider implements ModelProviderInterface {
   @override
-  String version = "4401034582a70c60713e1f7f9da3b752";
+  String version = "3696e5cdd326dfa3222da3c867f404a4";
   @override
-  List<ModelSchema> modelSchemas = [Todo.schema];
+  List<ModelSchema> modelSchemas = [Todo.schema, UserSession.schema];
   static final ModelProvider _instance = ModelProvider();
   @override
-  List<ModelSchema> customTypeSchemas = [];
+  List<ModelSchema> customTypeSchemas = [Devices.schema];
 
   static ModelProvider get instance => _instance;
   
@@ -39,6 +43,8 @@ class ModelProvider implements ModelProviderInterface {
     switch(modelName) {
       case "Todo":
         return Todo.classType;
+      case "UserSession":
+        return UserSession.classType;
       default:
         throw Exception("Failed to find model in model provider for model name: " + modelName);
     }

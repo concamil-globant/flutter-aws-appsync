@@ -7,3 +7,16 @@ type Todo @model {
   name: String!
   description: String
 }
+
+type Devices {
+  date: AWSDate
+  devices_id: String
+  os: String
+}
+
+type UserSession @model {
+  client_id: ID!
+  devices: [Devices]
+  last_device: String!
+  msisdn: String!
+}
